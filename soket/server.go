@@ -38,7 +38,7 @@ func handleClient(conn net.Conn) {
 	checkError(err)
 
 	message := string(messageBuf[:messageLen])
-	message = message + "too!"
+	message = message + " too!"
 
 	conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 	conn.Write([]byte(message))
