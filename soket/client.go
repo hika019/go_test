@@ -16,10 +16,12 @@ func main() {
 	message := os.Args[1]
 
 	protocol := "tcp"
-	serverIP := "192.168.11.30"
+	serverIP := "192.168.11.50"
 	serverPort := "55555"
-	myIP := "192"
+	myIP := get_my_ip()
 	myPort := 55556
+
+	fmt.Println("init setting")
 
 	tcpAddr, err := net.ResolveTCPAddr(protocol, serverIP+":"+serverPort)
 	checkError(err)
@@ -29,6 +31,8 @@ func main() {
 	myAddr.Port = myPort
 	conn, err := net.DialTCP(protocol, myAddr, tcpAddr)
 	checkError(err)
+
+	fmt.Println("TCPconnect")
 
 	defer conn.Close()
 
@@ -48,4 +52,23 @@ func checkError(err error) {
 		fmt.Fprint(os.Stderr, "fatal: error: &s", err.Error())
 		os.Exit(1)
 	}
+}
+
+func get_my_ip() string {
+	addrs, err := net.InterfaceAddrs()
+	checkError(err)
+
+	for _, addr := range addrs {
+		if ipnet, ok := addr.(*net.IPNet); ok {
+
+			if ipnet.IP.To4() != nil {
+				fmt.Println(ipnet.IP.String())
+				return ipnet.IP.String()
+			}
+		}
+	}
+
+	fmt.Fprint(os.Stderr, "failed get IP address")
+	os.Exit(1)
+	return ""
 }
