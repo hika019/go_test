@@ -42,7 +42,7 @@ func handleClient(conn net.Conn) {
 
 	conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 	conn.Write([]byte(message))
-
+	conn.Close()
 }
 
 func checkError(err error) {
