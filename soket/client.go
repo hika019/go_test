@@ -16,12 +16,14 @@ func main() {
 	message := os.Args[1]
 
 	protocol := "tcp"
-	serverIP := "192.168.11.50"
+	serverIP := "192.168.11.30"
 	serverPort := "55555"
-	myIP := get_my_ip()
+	//myIP := get_my_ip()
+	myIP := "192.168.11.50"
 	myPort := 55556
 
 	fmt.Println("init setting")
+	fmt.Println(serverIP)
 
 	tcpAddr, err := net.ResolveTCPAddr(protocol, serverIP+":"+serverPort)
 	checkError(err)
@@ -49,7 +51,7 @@ func main() {
 
 func checkError(err error) {
 	if err != nil {
-		fmt.Fprint(os.Stderr, "fatal: error: &s", err.Error())
+		fmt.Print("fatal: error: &s", err.Error())
 		os.Exit(1)
 	}
 }
