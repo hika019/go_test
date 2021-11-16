@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"./../lib"
+	"HelloWorld2/lib"
 )
 
 func main() {
