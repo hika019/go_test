@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 )
 
@@ -14,10 +13,32 @@ func main() {
 
 	path := os.Args[1]
 
-	bytes, err := ioutil.ReadFile(path)
-	checkError(err)
-	fmt.Println(string(bytes))
+	read_file(path)
 
+	/*
+		bytes, err := ioutil.ReadFile(path)
+		checkError(err)
+		fmt.Println(string(bytes))
+	*/
+}
+
+func read_file(path string) {
+	fp, err := os.Open(path)
+	checkError(err)
+
+	defer fp.Close()
+
+	buf := make([]byte, 128)
+	for {
+		bytes, err := fp.Read(buf)
+		if bytes == 0 {
+			break
+		}
+		checkError(err)
+		fmt.Printf("%d byte\n", bytes)
+		fmt.Println(buf)
+
+	}
 }
 
 func checkError(err error) {
