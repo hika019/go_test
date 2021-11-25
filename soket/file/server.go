@@ -50,11 +50,12 @@ func handleClient(conn net.Conn) {
 
 	for {
 		conn.SetReadDeadline(time.Now().Add(10 * time.Second))
-		conn.Read(messageBuf)
+		messageLen, err := conn.Read(messageBuf)
+		checkError(err)
 		if flag == true {
 			fp.Close()
 			file_name = string(messageBuf)
-			err := os.Rename("tmp.txt", file_name)
+			err := os.Rename("tmp.txt", file_name[:messageLen])
 			checkError(err)
 			break
 		} else {
