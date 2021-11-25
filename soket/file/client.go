@@ -64,6 +64,7 @@ func main() {
 		conn.Write(buf)
 
 		fmt.Printf("%d byte\n", bytes)
+		fmt.Println(string(buf))
 		//fmt.Println(buf)
 
 	}
