@@ -29,22 +29,27 @@ func main() {
 			continue
 		}
 
-		//handleClient(conn)
+		handleClient(conn)
+		/*
+			defer conn.Close()
 
-		defer conn.Close()
+			conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+			fmt.Println("client accept")
+			messageBuf := make([]byte, 800)
+			messageLen, err := conn.Read(messageBuf)
+			checkError(err)
 
-		conn.SetReadDeadline(time.Now().Add(10 * time.Second))
-		fmt.Println("client accept")
-		messageBuf := make([]byte, 800)
-		messageLen, err := conn.Read(messageBuf)
-		checkError(err)
-
-		fmt.Print(messageBuf[:messageLen])
-
+			fmt.Print(messageBuf[:messageLen])
+		*/
 	}
 }
 
 func handleClient(conn net.Conn) {
+	fp, err := os.Create("out.txt")
+	checkError(err)
+
+	defer fp.Close()
+
 	defer conn.Close()
 
 	conn.SetReadDeadline(time.Now().Add(10 * time.Second))
@@ -54,6 +59,7 @@ func handleClient(conn net.Conn) {
 	checkError(err)
 
 	fmt.Print(messageBuf[:messageLen])
+	fmt.Fprintf(fp, "%s", string(messageBuf[:messageLen]))
 }
 
 func checkError(err error) {
