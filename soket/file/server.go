@@ -33,15 +33,13 @@ func main() {
 
 		defer conn.Close()
 
-		Buf := make([]byte, 800)
-		Buf_len, err := conn.Read(Buf)
+		conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+		fmt.Println("client accept")
+		messageBuf := make([]byte, 800)
+		messageLen, err := conn.Read(messageBuf)
 		checkError(err)
 
-		if Buf_len == 0 {
-			break
-		}
-
-		fmt.Fprintf(fp, "%s", string(Buf[:Buf_len]))
+		fmt.Print(messageBuf[:messageLen])
 
 	}
 }
