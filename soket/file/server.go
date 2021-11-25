@@ -17,12 +17,6 @@ func main() {
 	listner, err := net.ListenTCP(protocol, tcpAddr)
 	checkError(err)
 
-	fp, err := os.Create("out.txt")
-	checkError(err)
-	fp.Close()
-
-	fp, err = os.OpenFile("out.txt", os.O_APPEND|os.O_WRONLY, 0600)
-
 	for {
 		conn, err := listner.Accept()
 		if err != nil {
@@ -47,21 +41,24 @@ func main() {
 func handleClient(conn net.Conn) {
 	defer conn.Close()
 	messageBuf := make([]byte, 800)
+	file_name := "tmp.txt"
 
 	flag := true
 	var fp *os.File
 	var err error
-	defer fp.Close()
 
 	for {
 		conn.SetReadDeadline(time.Now().Add(10 * time.Second))
 		conn.Read(messageBuf)
 		if flag == true {
-			fp, err = os.Create(string(messageBuf))
+			file_name = string(messageBuf)
+			fp, err = os.Create(file_name)
 			checkError(err)
+			fp.Close()
 			fmt.Println("get the file name")
 			flag = false
 		} else {
+			fp, err = os.OpenFile(file_name, os.O_APPEND|os.O_WRONLY, 0600)
 			conn.SetReadDeadline(time.Now().Add(10 * time.Second))
 			fmt.Println("client accept")
 
@@ -73,6 +70,7 @@ func handleClient(conn net.Conn) {
 
 			fmt.Print(messageBuf[:messageLen])
 			fmt.Fprintf(fp, "%s", string(messageBuf[:messageLen]))
+			fp.Close()
 		}
 	}
 }
