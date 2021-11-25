@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"time"
 )
 
 func main() {
@@ -12,6 +13,7 @@ func main() {
 
 	tcpAddr, err := net.ResolveTCPAddr(protocol, port)
 	checkError(err)
+
 	listner, err := net.ListenTCP(protocol, tcpAddr)
 	checkError(err)
 
@@ -27,19 +29,33 @@ func main() {
 			continue
 		}
 
-		defer conn.Close()
+		handleClient(conn)
+		/*
+			defer conn.Close()
 
-		Buf := make([]byte, 800)
-		Buf_len, err := conn.Read(Buf)
-		checkError(err)
+			Buf := make([]byte, 800)
+			Buf_len, err := conn.Read(Buf)
+			checkError(err)
 
-		if Buf_len == 0 {
-			break
-		}
+			if Buf_len == 0 {
+				break
+			}
 
-		fmt.Fprintf(fp, "%s", string(Buf[:Buf_len]))
-
+			fmt.Fprintf(fp, "%s", string(Buf[:Buf_len]))
+		*/
 	}
+}
+
+func handleClient(conn net.Conn) {
+	defer conn.Close()
+
+	conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+	fmt.Println("client accept")
+	messageBuf := make([]byte, 800)
+	messageLen, err := conn.Read(messageBuf)
+	checkError(err)
+
+	fmt.Print(messageBuf[:messageLen])
 }
 
 func checkError(err error) {
