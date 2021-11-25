@@ -29,7 +29,7 @@ func main() {
 			continue
 		}
 
-		handleClient(conn)
+		go handleClient(conn)
 		/*
 			defer conn.Close()
 
@@ -45,21 +45,36 @@ func main() {
 }
 
 func handleClient(conn net.Conn) {
-	fp, err := os.Create("out.txt")
-	checkError(err)
+	defer conn.Close()
+	messageBuf := make([]byte, 800)
 
+	flag := true
+	var fp *os.File
+	var err error
 	defer fp.Close()
 
-	defer conn.Close()
+	for {
+		conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+		conn.Read(messageBuf)
+		if flag == true {
+			fp, err = os.Create(string(messageBuf))
+			checkError(err)
+			fmt.Println("get the file name")
+			flag = false
+		} else {
+			conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+			fmt.Println("client accept")
 
-	conn.SetReadDeadline(time.Now().Add(10 * time.Second))
-	fmt.Println("client accept")
-	messageBuf := make([]byte, 800)
-	messageLen, err := conn.Read(messageBuf)
-	checkError(err)
+			messageLen, err := conn.Read(messageBuf)
+			checkError(err)
+			if messageLen == 0 {
+				break
+			}
 
-	fmt.Print(messageBuf[:messageLen])
-	fmt.Fprintf(fp, "%s", string(messageBuf[:messageLen]))
+			fmt.Print(messageBuf[:messageLen])
+			fmt.Fprintf(fp, "%s", string(messageBuf[:messageLen]))
+		}
+	}
 }
 
 func checkError(err error) {

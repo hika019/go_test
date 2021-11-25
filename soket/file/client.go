@@ -19,9 +19,9 @@ func main() {
 	myIP := "192.168.11.30"
 	myPort := 55556
 
-	path := os.Args[1]
+	file_name := os.Args[1]
 
-	fp, err := os.Open(path)
+	fp, err := os.Open(file_name)
 	checkError(err)
 
 	tcpAddr, err := net.ResolveTCPAddr(protocol, serverIP+":"+serverPort)
@@ -51,20 +51,24 @@ func main() {
 	*/
 
 	defer fp.Close()
+	sent_binary := make([]byte, 800)
 
-	buf := make([]byte, 800)
+	conn.SetDeadline(time.Now().Add(10 * time.Second))
+	conn.Write([]byte(file_name))
+	fmt.Println("Sent the file name")
+
 	for {
-		bytes, err := fp.Read(buf)
+		bytes, err := fp.Read(sent_binary)
 		if bytes == 0 {
 			break
 		}
 		checkError(err)
 
 		conn.SetDeadline(time.Now().Add(10 * time.Second))
-		conn.Write(buf)
+		conn.Write(sent_binary)
 
 		fmt.Printf("%d byte\n", bytes)
-		fmt.Println(string(buf))
+		fmt.Println(string(sent_binary))
 		//fmt.Println(buf)
 
 	}
