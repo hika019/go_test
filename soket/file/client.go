@@ -24,7 +24,13 @@ func main() {
 	fp, err := os.Open(path)
 	checkError(err)
 
-	conn, err := net.Dial(protocol, serverIP+":"+serverPort)
+	tcpAddr, err := net.ResolveTCPAddr(protocol, serverIP+":"+serverPort)
+	checkError(err)
+
+	myAddr := new(net.TCPAddr)
+	myAddr.IP = net.ParseIP(myIP)
+	myAddr.Port = myPort
+	conn, err := net.DialTCP(protocol, myAddr, tcpAddr)
 	checkError(err)
 
 	defer conn.Close()
