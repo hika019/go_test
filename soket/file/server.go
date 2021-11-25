@@ -29,20 +29,20 @@ func main() {
 			continue
 		}
 
-		handleClient(conn)
-		/*
-			defer conn.Close()
+		//handleClient(conn)
 
-			Buf := make([]byte, 800)
-			Buf_len, err := conn.Read(Buf)
-			checkError(err)
+		defer conn.Close()
 
-			if Buf_len == 0 {
-				break
-			}
+		Buf := make([]byte, 800)
+		Buf_len, err := conn.Read(Buf)
+		checkError(err)
 
-			fmt.Fprintf(fp, "%s", string(Buf[:Buf_len]))
-		*/
+		if Buf_len == 0 {
+			break
+		}
+
+		fmt.Fprintf(fp, "%s", string(Buf[:Buf_len]))
+
 	}
 }
 
