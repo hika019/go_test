@@ -41,36 +41,39 @@ func main() {
 func handleClient(conn net.Conn) {
 	defer conn.Close()
 	messageBuf := make([]byte, 800)
+
 	file_name := "tmp.txt"
+	fp, err := os.Create(file_name)
+	checkError(err)
 
 	flag := true
-	var fp *os.File
-	var err error
 
 	for {
 		conn.SetReadDeadline(time.Now().Add(10 * time.Second))
 		conn.Read(messageBuf)
 		if flag == true {
+			fp.Close()
 			file_name = string(messageBuf)
-			fp, err = os.Create(file_name)
+			err := os.Rename("tmp.txt", file_name)
 			checkError(err)
-			fp.Close()
-			fmt.Println("get the file name")
-			flag = false
+			break
 		} else {
-			fp, err = os.OpenFile(file_name, os.O_APPEND|os.O_WRONLY, 0600)
-			conn.SetReadDeadline(time.Now().Add(10 * time.Second))
-			fmt.Println("client accept")
+			break
+			/*
+				fp, err = os.OpenFile(file_name, os.O_APPEND|os.O_WRONLY, 0600)
+				conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+				fmt.Println("client accept")
 
-			messageLen, err := conn.Read(messageBuf)
-			checkError(err)
-			if messageLen == 0 {
-				break
-			}
+				messageLen, err := conn.Read(messageBuf)
+				checkError(err)
+				if messageLen == 0 {
+					break
+				}
 
-			fmt.Print(messageBuf[:messageLen])
-			fmt.Fprintf(fp, "%s", string(messageBuf[:messageLen]))
-			fp.Close()
+				fmt.Print(messageBuf[:messageLen])
+				fmt.Fprintf(fp, "%s", string(messageBuf[:messageLen]))
+				fp.Close()
+			*/
 		}
 	}
 }

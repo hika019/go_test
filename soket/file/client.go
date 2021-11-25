@@ -34,44 +34,31 @@ func main() {
 	checkError(err)
 
 	defer conn.Close()
-	/*
-		//ファイル名の転送
-		conn.SetDeadline(time.Now().Add(10 * time.Second))
-		conn.Write([]byte(path))
-
-		//ファイル名の送信ができたか
-		readBuff := make([]byte, 1024)
-		conn.SetReadDeadline(time.Now().Add(10 * time.Second))
-		readlen, err := conn.Read(readBuff)
-		checkError(err)
-		if int(readlen) != 0 {
-			fmt.Fprintln(os.Stderr, "fatal: error: can't sent file name")
-			os.Exit(1)
-		}
-	*/
 
 	defer fp.Close()
-	sent_binary := make([]byte, 800)
+	//sent_binary := make([]byte, 800)
 
 	conn.SetDeadline(time.Now().Add(10 * time.Second))
 	conn.Write([]byte(file_name))
 	fmt.Println("Sent the file name")
 
-	for {
-		bytes, err := fp.Read(sent_binary)
-		if bytes == 0 {
-			break
+	/*
+		for {
+			bytes, err := fp.Read(sent_binary)
+			if bytes == 0 {
+				break
+			}
+			checkError(err)
+
+			conn.SetDeadline(time.Now().Add(10 * time.Second))
+			conn.Write(sent_binary)
+
+			fmt.Printf("%d byte\n", bytes)
+			fmt.Println(string(sent_binary))
+			//fmt.Println(buf)
+
 		}
-		checkError(err)
-
-		conn.SetDeadline(time.Now().Add(10 * time.Second))
-		conn.Write(sent_binary)
-
-		fmt.Printf("%d byte\n", bytes)
-		fmt.Println(string(sent_binary))
-		//fmt.Println(buf)
-
-	}
+	*/
 
 	/*
 		bytes, err := ioutil.ReadFile(path)
