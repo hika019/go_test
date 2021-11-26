@@ -36,16 +36,15 @@ func main() {
 	defer conn.Close()
 
 	defer fp.Close()
-	sent_binary := make([]byte, 800)
-
-	/*
-		conn.SetDeadline(time.Now().Add(10 * time.Second))
-		conn.Write([]byte(file_name))
-		fmt.Println("Sent the file name")
-	*/
+	sent_binary := make([]byte, 803)
 
 	for {
-		bytes, err := fp.Read(sent_binary)
+		bytes, err := fp.Read(sent_binary[:800])
+		bytes_size := int_to_byte(uint16(bytes))
+
+		sent_binary[801] = bytes_size[0]
+		sent_binary[802] = bytes_size[1]
+
 		if bytes == 0 {
 			break
 		}
@@ -55,7 +54,8 @@ func main() {
 		conn.Write(sent_binary)
 
 		fmt.Printf("%d byte\n", bytes)
-		fmt.Println(string(sent_binary))
+		//fmt.Println(sent_binary)
+		//fmt.Println(string(sent_binary))
 		//fmt.Println(buf)
 	}
 	fmt.Println("sent the file data")
@@ -63,11 +63,4 @@ func main() {
 	conn.SetDeadline(time.Now().Add(10 * time.Second))
 	conn.Write([]byte(file_name))
 	fmt.Println("Sent the file name")
-}
-
-func checkError(err error) {
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "fatal: error: %s", err.Error())
-		os.Exit(1)
-	}
 }

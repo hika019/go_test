@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/rand"
 	"fmt"
 	"net"
 	"os"
@@ -24,24 +25,22 @@ func main() {
 		}
 
 		go handleClient(conn)
-		/*
-			defer conn.Close()
 
-			conn.SetReadDeadline(time.Now().Add(10 * time.Second))
-			fmt.Println("client accept")
-			messageBuf := make([]byte, 800)
-			messageLen, err := conn.Read(messageBuf)
-			checkError(err)
-
-			fmt.Print(messageBuf[:messageLen])
-		*/
 	}
 }
 
 func handleClient(conn net.Conn) {
+
+	addr, ok := conn.RemoteAddr().(*net.TCPAddr)
+	if !ok {
+		return
+	}
+
+	fmt.Println(addr.IP.String())
+
 	defer conn.Close()
-	messageBuf := make([]byte, 800)
-	tmp_file_name := "tmp.txt"
+	messageBuf := make([]byte, 803)
+	tmp_file_name := "tmp-" + MakeRandomStr() + ".txt"
 
 	fp, err := os.OpenFile(tmp_file_name, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	checkError(err)
@@ -50,7 +49,9 @@ func handleClient(conn net.Conn) {
 		conn.SetReadDeadline(time.Now().Add(10 * time.Second))
 		messageLen, err := conn.Read(messageBuf)
 		checkError(err)
-		if messageLen != 800 {
+		fmt.Printf("%d byte\n", messageLen)
+		//fmt.Println(messageBuf[:messageLen])
+		if messageLen != 803 {
 			fmt.Println("Downloaded file data")
 			fp.Close()
 
@@ -61,15 +62,27 @@ func handleClient(conn net.Conn) {
 			break
 		}
 		//ファイルに書き込み
-		fp.Write(messageBuf[:messageLen])
+
+		data_size_byte := make([]byte, 2)
+		data_size_byte[0] = messageBuf[801]
+		data_size_byte[1] = messageBuf[802]
+		data_size := byte_to_int(data_size_byte)
+		fmt.Printf("%d byte\n", data_size)
+
+		fmt.Fprintf(fp, "%s", string(messageBuf[:data_size]))
 
 	}
 
 }
 
-func checkError(err error) {
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "fatal: error: ", err.Error())
-		os.Exit(1)
+func MakeRandomStr() string {
+	b := make([]byte, 15)
+	_, err := rand.Read(b)
+	checkError(err)
+
+	var str string
+	for _, v := range b {
+		str += string(v%byte(94) + 33)
 	}
+	return str
 }
