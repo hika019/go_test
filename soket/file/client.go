@@ -36,35 +36,33 @@ func main() {
 	defer conn.Close()
 
 	defer fp.Close()
-	//sent_binary := make([]byte, 800)
+	sent_binary := make([]byte, 800)
+
+	/*
+		conn.SetDeadline(time.Now().Add(10 * time.Second))
+		conn.Write([]byte(file_name))
+		fmt.Println("Sent the file name")
+	*/
+
+	for {
+		bytes, err := fp.Read(sent_binary)
+		if bytes == 0 {
+			break
+		}
+		checkError(err)
+
+		conn.SetDeadline(time.Now().Add(10 * time.Second))
+		conn.Write(sent_binary)
+
+		fmt.Printf("%d byte\n", bytes)
+		fmt.Println(string(sent_binary))
+		//fmt.Println(buf)
+	}
+	fmt.Println("sent the file data")
 
 	conn.SetDeadline(time.Now().Add(10 * time.Second))
 	conn.Write([]byte(file_name))
 	fmt.Println("Sent the file name")
-
-	/*
-		for {
-			bytes, err := fp.Read(sent_binary)
-			if bytes == 0 {
-				break
-			}
-			checkError(err)
-
-			conn.SetDeadline(time.Now().Add(10 * time.Second))
-			conn.Write(sent_binary)
-
-			fmt.Printf("%d byte\n", bytes)
-			fmt.Println(string(sent_binary))
-			//fmt.Println(buf)
-
-		}
-	*/
-
-	/*
-		bytes, err := ioutil.ReadFile(path)
-		checkError(err)
-		fmt.Println(string(bytes))
-	*/
 }
 
 func checkError(err error) {
