@@ -57,6 +57,7 @@ func handleClient(conn net.Conn) {
 		fp.Write(messageBuf[:messageLen])
 
 	}
+	fmt.Println("Downloaded file data")
 
 	//ファイル名の変更
 	conn.SetReadDeadline(time.Now().Add(10 * time.Second))
@@ -64,7 +65,7 @@ func handleClient(conn net.Conn) {
 	checkError(err)
 	fp.Close()
 
-	file_name := string(messageBuf[:messageLen])
+	file_name := string(messageBuf[:messageLen-16])
 	err = os.Rename(tmp_file_name, file_name)
 	checkError(err)
 }
