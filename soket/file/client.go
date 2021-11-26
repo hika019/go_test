@@ -67,7 +67,7 @@ func main() {
 
 func checkError(err error) {
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "fatal: error: &s", err.Error())
+		fmt.Fprintln(os.Stderr, "fatal: error: %s", err.Error())
 		os.Exit(1)
 	}
 }
