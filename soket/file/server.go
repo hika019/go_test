@@ -50,29 +50,25 @@ func handleClient(conn net.Conn) {
 		conn.SetReadDeadline(time.Now().Add(10 * time.Second))
 		messageLen, err := conn.Read(messageBuf)
 		checkError(err)
-		if messageLen == 0 {
+		if messageLen != 800 {
+			fmt.Println("Downloaded file data")
+			fp.Close()
+
+			file_name := string(messageBuf[:messageLen-16])
+			err = os.Rename(tmp_file_name, file_name)
+			checkError(err)
 			break
 		}
 		//ファイルに書き込み
 		fp.Write(messageBuf[:messageLen])
 
 	}
-	fmt.Println("Downloaded file data")
 
-	//ファイル名の変更
-	conn.SetReadDeadline(time.Now().Add(10 * time.Second))
-	messageLen, err := conn.Read(messageBuf)
-	checkError(err)
-	fp.Close()
-
-	file_name := string(messageBuf[:messageLen-16])
-	err = os.Rename(tmp_file_name, file_name)
-	checkError(err)
 }
 
 func checkError(err error) {
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "fatal: error: %s", err.Error())
+		fmt.Fprintln(os.Stderr, "fatal: error: ", err.Error())
 		os.Exit(1)
 	}
 }
