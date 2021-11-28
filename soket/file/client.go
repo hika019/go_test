@@ -36,31 +36,35 @@ func main() {
 	defer conn.Close()
 
 	defer fp.Close()
-	sent_binary := make([]byte, 803)
+	sent_binary := make([]byte, soket_size)
+	tmp := 0
+
+	conn.SetDeadline(time.Now().Add(50 * time.Second))
+	fmt.Println(file_name)
+	conn.Write([]byte(file_name + ":"))
+	fmt.Println("Sent the file name")
 
 	for {
-		bytes, err := fp.Read(sent_binary[:800])
+		bytes, err := fp.Read(sent_binary[:data_size])
+		fmt.Println(bytes)
 		bytes_size := int_to_byte(uint16(bytes))
+		tmp++
 
-		sent_binary[801] = bytes_size[0]
-		sent_binary[802] = bytes_size[1]
-
+		sent_binary[data_size_byte_pos1] = bytes_size[0]
+		sent_binary[data_size_byte_pos2] = bytes_size[1]
 		if bytes == 0 {
 			break
 		}
 		checkError(err)
 
-		conn.SetDeadline(time.Now().Add(10 * time.Second))
+		fmt.Println(sent_binary)
 		conn.Write(sent_binary)
-
-		fmt.Printf("%d byte\n", bytes)
-		//fmt.Println(sent_binary)
+		fmt.Println(bytes)
 		//fmt.Println(string(sent_binary))
 		//fmt.Println(buf)
 	}
 	fmt.Println("sent the file data")
+	fmt.Println(tmp)
+	conn.Write([]byte("end sent data"))
 
-	conn.SetDeadline(time.Now().Add(10 * time.Second))
-	conn.Write([]byte(file_name))
-	fmt.Println("Sent the file name")
 }
