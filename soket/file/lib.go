@@ -5,10 +5,10 @@ import (
 	"os"
 )
 
-const soket_size int = 2048
-const data_size int = 2040
-const data_size_byte_pos1 int = 2041
-const data_size_byte_pos2 int = 2042
+const soket_size int = 803
+const data_size int = 800
+const data_size_byte_pos1 int = 801
+const data_size_byte_pos2 int = 802
 
 func int_to_byte(i uint16) []byte {
 
