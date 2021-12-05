@@ -53,29 +53,39 @@ func handleClient(conn net.Conn) {
 	defer fp.Close()
 
 	tmp := 0
-	conn.SetReadDeadline(time.Now().Add(20 * time.Second))
+	conn.SetReadDeadline(time.Now().Add(50 * time.Second))
 	for {
 		messageBuf := make([]byte, soket_size)
 		messageLen, err := conn.Read(messageBuf)
-		fmt.Println(messageBuf)
+		//fmt.Println(messageBuf)
 		checkError(err)
-		fmt.Printf("%d byte\n", messageLen)
-		//fmt.Println(messageBuf[:messageLen])
-		fmt.Println(messageLen)
-		fmt.Println(soket_size)
-		if messageLen == soket_size {
+
+		data_size_byte := make([]byte, 2)
+		var data_size uint16 = 0
+
+		if messageLen != 0 {
+			data_size_byte[0] = messageBuf[data_size_byte_pos1]
+			data_size_byte[1] = messageBuf[data_size_byte_pos2]
+			data_size = byte_to_int(data_size_byte)
+		}
+
+		if data_size == 0 {
 			fmt.Println("Downloaded file data")
+			fmt.Println(tmp)
 			break
 		}
+
+		//fmt.Printf("%d byte\n", messageLen)
+
+		//fmt.Println(data_size)
+
+		//fmt.Println(string(messageBuf[:data_size]))
+		fmt.Println(tmp)
+		fmt.Println(messageBuf)
+		fmt.Fprintf(fp, "%v", string(messageBuf[:data_size]))
+
 		//ファイルに書き込み
 		tmp++
-		data_size_byte := make([]byte, 2)
-		data_size_byte[0] = messageBuf[data_size_byte_pos1]
-		data_size_byte[1] = messageBuf[data_size_byte_pos2]
-		data_size := byte_to_int(data_size_byte)
-		fmt.Println(data_size)
-		fmt.Println("messageBuf")
-		fmt.Fprintf(fp, "%T", messageBuf[:messageLen])
 
 	}
 

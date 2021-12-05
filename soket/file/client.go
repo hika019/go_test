@@ -57,9 +57,11 @@ func main() {
 		}
 		checkError(err)
 
+		//fmt.Println(sent_binary)
+		fmt.Println(tmp)
 		fmt.Println(sent_binary)
 		conn.Write(sent_binary)
-		fmt.Println(bytes)
+		//fmt.Println(bytes)
 		//fmt.Println(string(sent_binary))
 		//fmt.Println(buf)
 	}
